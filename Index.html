@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CC AI Chat</title>
+
+<style>
+
+body{
+background:#0f172a;
+font-family:Arial;
+color:white;
+margin:0;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+#chatbox{
+height:400px;
+overflow:auto;
+border:1px solid #334155;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+background:#020617;
+}
+
+.user{
+color:#38bdf8;
+margin:10px 0;
+}
+
+.ai{
+color:#22c55e;
+margin:10px 0;
+}
+
+.input-area{
+display:flex;
+gap:10px;
+}
+
+input{
+flex:1;
+padding:10px;
+border-radius:5px;
+border:none;
+}
+
+button{
+padding:10px;
+background:#38bdf8;
+border:none;
+border-radius:5px;
+color:white;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🤖 CC AI Chat</h1>
+
+<div id="chatbox"></div>
+
+<div class="input-area">
+
+<input id="userInput" placeholder="Ask anything...">
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+
+</div>
+
+<script>
+
+async function sendMessage(){
+
+let input = document.getElementById("userInput");
+let chatbox = document.getElementById("chatbox");
+
+let message = input.value.trim();
+
+if(message === "") return;
+
+chatbox.innerHTML += `<div class="user">You: ${message}</div>`;
+
+input.value = "";
+
+chatbox.innerHTML += `<div class="ai" id="typing">AI typing...</div>`;
+
+chatbox.scrollTop = chatbox.scrollHeight;
+
+try{
+
+let response = await fetch("https://cc-ai.onrender.com/chat",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message:message
+})
+});
+
+let data = await response.json();
+
+document.getElementById("typing").remove();
+
+chatbox.innerHTML += `<div class="ai">AI: ${data.reply}</div>`;
+
+}catch(error){
+
+document.getElementById("typing").remove();
+
+chatbox.innerHTML += `<div class="ai">⚠️ Server error. Try again.</div>`;
+
+}
+
+chatbox.scrollTop = chatbox.scrollHeight;
+
+}
+
+document.getElementById("userInput").addEventListener("keypress", function(e){
+if(e.key === "Enter"){
+sendMessage();
+}
+});
+
+</script>
+
+</body>
+</html>
